@@ -6,7 +6,7 @@ import { sendSuccess } from "../../utils/response.js";
 import { deleteCache, deleteByPattern } from "../../services/cache.service.js";
 import { CACHE_KEYS } from "../../config/cache.js";
 import { UUID_REGEX } from "../../utils/uuid.js";
-import { replaceImage } from "../../services/image.service.js";
+import { replaceImage, formatRecordImage } from "../../services/image.service.js";
 
 // @Desc Update existing testimonial
 // @Route PUT /api/testimonials/:id
@@ -109,7 +109,7 @@ export const updateTestimonial = AsyncHandler(async (req, res, next) => {
         return sendSuccess(res, {
             statusCode: 200,
             message: "Testimonial updated successfully",
-            results: updated,
+            results: formatRecordImage(STORAGE_BUCKETS.TESTIMONIALS, updated, "client_image"),
         });
     }
 
@@ -132,6 +132,6 @@ export const updateTestimonial = AsyncHandler(async (req, res, next) => {
     return sendSuccess(res, {
         statusCode: 200,
         message: "Testimonial updated successfully",
-        results: updatedTestimonial,
+        results: formatRecordImage(STORAGE_BUCKETS.TESTIMONIALS, updatedTestimonial, "client_image"),
     });
 });

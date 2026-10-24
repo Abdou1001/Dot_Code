@@ -1,10 +1,12 @@
 import { supabase } from "../../config/supabase.js";
+import { STORAGE_BUCKETS } from "../../config/storage.js";
 import AsyncHandler from "express-async-handler";
 import ApiError from "../../utils/ApiError.js";
 import { paginate, paginationResult } from "../../utils/pagination.js";
 import { sendSuccess } from "../../utils/response.js";
 import { getCache, setCache } from "../../services/cache.service.js";
 import { CACHE_KEYS, CACHE_TTL } from "../../config/cache.js";
+import { formatRecordImages } from "../../services/image.service.js";
 
 // @Desc Get list of testimonials for public use (published only)
 // @Route GET /api/testimonials
@@ -59,7 +61,11 @@ export const getTestimonials = AsyncHandler(async (req, res, next) => {
         return next(new ApiError("Failed to fetch testimonials", 500));
     }
 
-    const results = testimonials || [];
+    const results = formatRecordImages(
+        STORAGE_BUCKETS.TESTIMONIALS,
+        testimonials || [],
+        "client_image"
+    );
     const pagination = hasPagination ? paginationResult(page, limit, count || 0) : undefined;
 
     // 3. Cache the results for public requests only
@@ -74,3 +80,4 @@ export const getTestimonials = AsyncHandler(async (req, res, next) => {
         results,
     });
 });
+

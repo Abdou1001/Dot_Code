@@ -8,6 +8,7 @@ import { CACHE_KEYS } from "../../config/cache.js";
 import {
     uploadAndProcessImage,
     rollbackUploadedImage,
+    formatRecordImage,
 } from "../../services/image.service.js";
 
 // @Desc Create new testimonial
@@ -63,7 +64,7 @@ export const createTestimonial = AsyncHandler(async (req, res, next) => {
         return sendSuccess(res, {
             statusCode: 201,
             message: "Testimonial created successfully",
-            results: newTestimonial,
+            results: formatRecordImage(STORAGE_BUCKETS.TESTIMONIALS, newTestimonial, "client_image"),
         });
     } catch (error) {
         if (uploadedImage) {

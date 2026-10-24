@@ -1,10 +1,12 @@
 import { supabase } from "../../config/supabase.js";
+import { STORAGE_BUCKETS } from "../../config/storage.js";
 import AsyncHandler from "express-async-handler";
 import ApiError from "../../utils/ApiError.js";
 import { sendSuccess } from "../../utils/response.js";
 import { getCache, setCache } from "../../services/cache.service.js";
 import { CACHE_KEYS, CACHE_TTL } from "../../config/cache.js";
 import { UUID_REGEX } from "../../utils/uuid.js";
+import { formatRecordImage } from "../../services/image.service.js";
 
 // @Desc Get one testimonial by ID
 // @Route GET /api/testimonials/:id
@@ -48,14 +50,21 @@ export const getTestimonialById = AsyncHandler(async (req, res, next) => {
         return next(new ApiError("Testimonial not found", 404));
     }
 
+    const formattedTestimonial = formatRecordImage(
+        STORAGE_BUCKETS.TESTIMONIALS,
+        testimonial,
+        "client_image"
+    );
+
     // 3. Cache testimonial for public users
     if (!isAdmin) {
-        await setCache(cacheKey, testimonial, CACHE_TTL.TESTIMONIALS);
+        await setCache(cacheKey, formattedTestimonial, CACHE_TTL.TESTIMONIALS);
     }
 
     return sendSuccess(res, {
         statusCode: 200,
         message: "Testimonial retrieved successfully",
-        results: testimonial,
+        results: formattedTestimonial,
     });
 });
+
