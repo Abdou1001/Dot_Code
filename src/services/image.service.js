@@ -1,5 +1,5 @@
-import {processImage} from "../utils/imageUploader.js";
-import {uploadImage, deleteImage} from "./storage.service.js";
+import { processImage } from "../utils/imageUploader.js";
+import { uploadImage, deleteImage, getPublicImageUrl } from "./storage.service.js";
 
 // Upload image and return image name
 export const uploadAndProcessImage = async (bucket, file) => {
@@ -7,7 +7,7 @@ export const uploadAndProcessImage = async (bucket, file) => {
     if (!file) return null;
 
     // Resize & compress image
-    const {fileName, buffer} = await processImage(file.buffer);
+    const { fileName, buffer } = await processImage(file.buffer);
 
     // Upload image to Storage
     await uploadImage(bucket, fileName, buffer);
@@ -15,8 +15,32 @@ export const uploadAndProcessImage = async (bucket, file) => {
     return fileName;
 };
 
+// Get public URL for image name or external URL
+export const getImageUrl = (bucket, fileName) => {
+    if (!fileName) return null;
+    return getPublicImageUrl(bucket, fileName);
+};
+
+// Format a single object/record to include the resolved public image URL
+export const formatRecordImage = (bucket, record, field = "image_url") => {
+    if (!record) return null;
+    if (record[field]) {
+        return {
+            ...record,
+            [field]: getImageUrl(bucket, record[field]),
+        };
+    }
+    return record;
+};
+
+// Format an array of objects/records to include the resolved public image URLs
+export const formatRecordImages = (bucket, records, field = "image_url") => {
+    if (!Array.isArray(records)) return [];
+    return records.map((record) => formatRecordImage(bucket, record, field));
+};
+
 // Replace image safely
-export const replaceImage = async ({bucket, currentImage, file, action}) => {
+export const replaceImage = async ({ bucket, currentImage, file, action }) => {
     // Keep old image
     let newImage = currentImage;
 
@@ -51,5 +75,8 @@ export const rollbackUploadedImage = async (bucket, fileName) => {
 
     await deleteImage(bucket, fileName);
 };
+
+export { getPublicImageUrl, uploadImage, deleteImage };
+
 
 

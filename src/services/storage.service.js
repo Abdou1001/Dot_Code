@@ -34,6 +34,10 @@ export const getPublicImageUrl = (bucket, fileName) => {
     // Image not found
     if (!fileName) return null;
 
+    if (typeof fileName === "string" && (fileName.startsWith("http://") || fileName.startsWith("https://"))) {
+        return fileName;
+    }
+
     const {data} = supabase.storage
         .from(bucket)
         .getPublicUrl(fileName);
