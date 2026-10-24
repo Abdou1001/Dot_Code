@@ -5,7 +5,7 @@ import ApiError from "../../utils/ApiError.js";
 import { sendSuccess } from "../../utils/response.js";
 import { deleteByPattern } from "../../services/cache.service.js";
 import { UUID_REGEX } from "../../utils/uuid.js";
-import { replaceImage } from "../../services/image.service.js";
+import { replaceImage, formatRecordImage } from "../../services/image.service.js";
 
 // @Desc Update project image details (alt, sort_order, is_featured, optional image replace)
 // @Route PUT /api/projects/:projectId/images/:id
@@ -90,7 +90,7 @@ export const updateProjectImage = AsyncHandler(async (req, res, next) => {
         return sendSuccess(res, {
             statusCode: 200,
             message: "Project image updated successfully",
-            results: updatedImage,
+            results: formatRecordImage(STORAGE_BUCKETS.PROJECTS, updatedImage, "image_url"),
         });
     }
 
@@ -112,6 +112,6 @@ export const updateProjectImage = AsyncHandler(async (req, res, next) => {
     return sendSuccess(res, {
         statusCode: 200,
         message: "Project image updated successfully",
-        results: updatedImage,
+        results: formatRecordImage(STORAGE_BUCKETS.PROJECTS, updatedImage, "image_url"),
     });
 });

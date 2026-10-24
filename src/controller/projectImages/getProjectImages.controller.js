@@ -1,8 +1,10 @@
 import { supabase } from "../../config/supabase.js";
+import { STORAGE_BUCKETS } from "../../config/storage.js";
 import AsyncHandler from "express-async-handler";
 import ApiError from "../../utils/ApiError.js";
 import { sendSuccess } from "../../utils/response.js";
 import { UUID_REGEX } from "../../utils/uuid.js";
+import { formatRecordImages } from "../../services/image.service.js";
 
 // @Desc Get images for a project
 // @Route GET /api/projects/:projectId/images
@@ -45,9 +47,16 @@ export const getProjectImages = AsyncHandler(async (req, res, next) => {
         return next(new ApiError("Failed to fetch project images", 500));
     }
 
+    const formattedImages = formatRecordImages(
+        STORAGE_BUCKETS.PROJECTS,
+        images || [],
+        "image_url"
+    );
+
     return sendSuccess(res, {
         statusCode: 200,
         message: "Project images retrieved successfully",
-        results: images || [],
+        results: formattedImages,
     });
 });
+

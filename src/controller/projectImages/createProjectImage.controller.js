@@ -8,6 +8,7 @@ import { UUID_REGEX } from "../../utils/uuid.js";
 import {
     uploadAndProcessImage,
     rollbackUploadedImage,
+    formatRecordImage,
 } from "../../services/image.service.js";
 
 // @Desc Upload and add an image to a project
@@ -80,7 +81,7 @@ export const createProjectImage = AsyncHandler(async (req, res, next) => {
         return sendSuccess(res, {
             statusCode: 201,
             message: "Project image uploaded successfully",
-            results: newImage,
+            results: formatRecordImage(STORAGE_BUCKETS.PROJECTS, newImage, "image_url"),
         });
     } catch (error) {
         if (uploadedImage) {

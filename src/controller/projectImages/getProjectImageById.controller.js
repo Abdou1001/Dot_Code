@@ -1,8 +1,10 @@
 import { supabase } from "../../config/supabase.js";
+import { STORAGE_BUCKETS } from "../../config/storage.js";
 import AsyncHandler from "express-async-handler";
 import ApiError from "../../utils/ApiError.js";
 import { sendSuccess } from "../../utils/response.js";
 import { UUID_REGEX } from "../../utils/uuid.js";
+import { formatRecordImage } from "../../services/image.service.js";
 
 // @Desc Get one image for a project
 // @Route GET /api/projects/:projectId/images/:id
@@ -53,9 +55,16 @@ export const getProjectImageById = AsyncHandler(async (req, res, next) => {
         return next(new ApiError("Project image not found", 404));
     }
 
+    const formattedImage = formatRecordImage(
+        STORAGE_BUCKETS.PROJECTS,
+        image,
+        "image_url"
+    );
+
     return sendSuccess(res, {
         statusCode: 200,
         message: "Project image retrieved successfully",
-        results: image,
+        results: formattedImage,
     });
 });
+
