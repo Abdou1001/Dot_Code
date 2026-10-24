@@ -11,6 +11,7 @@ import { CACHE_KEYS } from "../../config/cache.js";
 export const createCategory = AsyncHandler(async (req, res, next) => {
     const {
         name,
+        name_ar,
         slug,
         sort_order = 0,
         is_active = true,
@@ -33,10 +34,11 @@ export const createCategory = AsyncHandler(async (req, res, next) => {
         return next(new ApiError("A category with this slug already exists", 409));
     }
 
-    const { data: newCategory, error: insertError } = await supabase
+    const {data: newCategory, error: insertError} = await supabase
         .from("categories")
         .insert({
             name: name.trim(),
+            name_ar: name_ar.trim(),
             slug: normalizedSlug,
             sort_order: Number(sort_order) || 0,
             is_active: Boolean(is_active),

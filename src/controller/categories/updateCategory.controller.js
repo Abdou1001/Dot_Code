@@ -39,6 +39,10 @@ export const updateCategory = AsyncHandler(async (req, res, next) => {
         updateData.name = req.body.name.trim();
     }
 
+    if (req.body.name_ar !== undefined) {
+        updateData.name_ar = req.body.name_ar.trim();
+    }
+
     if (req.body.slug !== undefined) {
         const normalizedSlug = req.body.slug.trim().toLowerCase();
 
